@@ -25,6 +25,7 @@ class Request {
   constructor(options) {
     this.method = options.method || 'GET';
     this.host = options.host;
+    this.path = options.path || '127.0.0.1';
     this.port = options.port || 80;
     this.body = options.body || {};
     this.headers = Object.assign(
