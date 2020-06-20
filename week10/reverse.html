@@ -1,0 +1,36 @@
+<div id="parent">
+    <span>1</span>
+    <span>2</span>
+    <span>3</span>
+    <span>4</span>
+</div>
+
+
+
+
+<script>
+    let ele = document.getElementById('parent');
+
+    function revserseChild(element) {
+        let len = element.childNodes.length;
+        while (len-- > 0) {
+            element.appendChild(element.childNodes[len])
+        }
+    }
+
+    function reverseChild2(element) {
+        let range = new Range();
+
+        range.selectNodeContents(element)
+        let fragment = range.extractContents();
+        let len = fragment.childNodes.length;
+        while (len-- > 0) {
+            fragment.appendChild(fragment.childNodes[len])
+        }
+        console.log(fragment)
+        element.appendChild(fragment)
+    }
+
+    //revserseChild(ele);
+    reverseChild2(ele)
+</script>

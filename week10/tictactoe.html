@@ -1,0 +1,195 @@
+<html>
+<script>
+
+</script>
+<style>
+    .cell {
+        display: inline-flex;
+        box-sizing: border-box;
+        width: 100px;
+        height: 100px;
+        border: 1px solid white;
+        background-color: green;
+        color: red;
+        font-weight: bold;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+        vertical-align: middle;
+    }
+</style>
+
+<body>
+    <div id="checkerboard" style="width: 300px;">
+    </div>
+</body>
+
+<script>
+    let checkerboard = document.getElementById('checkerboard')
+    let pattern = [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
+    ]
+    const BOARD_SIZE = pattern.length;
+
+    let color = 1
+    paint()
+
+    function paint() {
+        checkerboard.innerHTML = ""
+        for (let i = 0; i < pattern.length; i++) {
+            let line = pattern[i]
+            for (let j = 0; j < line.length; j++) {
+                let item = line[j]
+                let cell = document.createElement('div');
+                cell.classList.add('cell')
+                cell.innerHTML = item === 2 ? "×" :
+                    item === 1 ? "○" :
+                    ""
+                cell.addEventListener('click', () => userMove(j, i))
+                checkerboard.appendChild(cell)
+            }
+        }
+    }
+
+    function userMove(x, y) {
+        if (pattern[y][x]) {
+            return
+        }
+        pattern[y][x] = color
+
+        if (check(pattern, color)) {
+            console.log((color === 2 ? "×" : "○") + " is Win")
+        }
+        color = 3 - color
+        let point = bestChoice(pattern, color);
+        console.log(point)
+        paint()
+        computerMove()
+    }
+
+    function computerMove(){
+        let choice = bestChoice(pattern, color);
+        if(choice.point){
+            pattern[choice.point[1]][choice.point[0]] = color
+        }
+        color= 3-color;
+        paint()
+
+
+    }
+
+
+
+    function check(pattern, color) {
+        let win = true;
+        for (let i = 0; i < pattern.length; i++) {
+            let line = pattern[i];
+            win = true;
+            for (let j = 0; j < line.length; j++) {
+                let item = line[j];
+                if (item != color) {
+                    win = false;
+                    break
+                }
+            }
+            if (win) {
+                return true
+            }
+        }
+
+        for (let i = 0; i < pattern.length; i++) {
+            win = true;
+            for (let j = 0; j < pattern[i].length; j++) {
+                let item = pattern[j][i];
+                if (item != color) {
+                    win = false;
+                    break
+                }
+            }
+            if (win) {
+                return true
+            }
+        }
+        win = true
+        for (let i = 0; i < pattern.length; i++) {
+            if (pattern[i][i] !== color) {
+                win = false;
+            }
+        }
+        if (win) {
+            return true
+        }
+        win = true
+        for (let i = 0; i < pattern.length; i++) {
+            if (pattern[i][BOARD_SIZE - 1 - i] !== color) {
+                win = false;
+            }
+        }
+        if (win) {
+            return true
+        }
+        return false
+    }
+
+    function cloneArray(array) {
+        return JSON.parse(JSON.stringify(array))
+    }
+
+    function willWin(pattern, color) {
+        for (let i = 0; i < pattern.length; i++) {
+            for (let j = 0; j < pattern[i].length; j++) {
+                if (pattern[i][j]) {
+                    continue
+                }
+                let tempArr = cloneArray(pattern);
+                tempArr[i][j] = color;
+                if (check(tempArr, color)) {
+                    // console.log((color === 2 ? "×" : "○") + " is will Win")
+                    return [j, i]
+                }
+            }
+        }
+        return false
+    }
+
+    function bestChoice(pattern, color) {
+        let point = null;
+        if (point = willWin(pattern, color)) {
+            return {
+                point,
+                result: 1
+            }
+        }
+        let result = -1;
+        outer: for (let i = 0; i < pattern.length; i++) {
+            for (let j = 0; j < pattern[i].length; j++) {
+                if (pattern[i][j]) {
+                    continue
+                }
+                let tempArr = cloneArray(pattern);
+                tempArr[i][j] = color;
+                let opp = bestChoice(tempArr, 3 - color)
+
+                if (-opp.result >= result) {
+                    result = -opp.result
+                    point = [j, i]
+                }
+                if (result === 1) {
+                    break outer;
+                }
+            }
+        }
+        return {
+            point: point,
+            result: point ? result : 0
+        }
+
+
+    }
+</script>
+
+
+
+</html>
