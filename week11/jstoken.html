@@ -1,0 +1,27 @@
+<script>
+    let source = `function sleep(t) {
+        return new Promise((resolve, reject) => {
+            setTimeout(resolve, t)
+        })
+    }`
+
+    let regexp = /(function|new|return)|([ \t\n\r]+)|([a-zA-Z][a-zA-Z0-9]*)([\(\)\{\}\,\;])/g
+    let dictionary = ["keywords", "whitespace", "identifier", "punctuator"];
+    let token = null;
+    let lastIndex = 0;
+    do {
+        lastIndex = regexp.lastIndex;
+        token = regexp.exec(source);
+     
+        if (!token)
+            break;
+        
+        for (let i = 1; i < 5; i++) {
+            if (token[i])
+                console.log(dictionary[i - 1],token[i])
+        }
+
+
+
+    } while (token)
+</script>
