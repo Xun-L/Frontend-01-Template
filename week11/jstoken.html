@@ -12,16 +12,12 @@
     do {
         lastIndex = regexp.lastIndex;
         token = regexp.exec(source);
-     
+    
         if (!token)
             break;
-        
         for (let i = 1; i < 5; i++) {
             if (token[i])
                 console.log(dictionary[i - 1],token[i])
         }
-
-
-
     } while (token)
 </script>
