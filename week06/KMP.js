@@ -44,5 +44,5 @@ function searchText(pattern, text) {
     return j === pattern.length
 }
 
-generateNext('abab')
+generateNext('aabaaac')
 //searchText('abab', 'abacacaabababababcc')
