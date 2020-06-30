@@ -2,7 +2,7 @@ function find(source, pattern) {
   if (!pattern) {
     return 0;
   }
-  let next = generateNext(pattern);
+  let next = getNext(pattern);
   let j = 0;
   for (let i = 0; i < source.length && j < pattern.length; ) {
     if (j == -1 || pattern[j] == source[i]) {
