@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调色盘</title>
+</head>
+
+<body>
+    <input type="range" min="0" max="255" id="r"><br>
+    <input type="range" min="0" max="255" id="g"><br>
+    <input type="range" min="0" max="255" id="b"><br>
+    <div id="palette" style="height: 130px;width:130px;border: 1px solid black;margin-top: 20px;"></div>
+
+
+
+</body>
+<script>
+    let handlers = new Map();
+    let reactivities = new Map();
+    let usedReactivities = [];
+
+    function reactive(object) {
+        if (reactivities.has(object)) {
+            return reactivities.get(object);
+        }
+
+        let proxy = new Proxy(object, {
+            get(obj, prop) {
+                usedReactivities.push([object, prop]);
+                if (typeof object[prop] === 'object') {
+                    return reactive(object[prop]);
+                }
+                return obj[prop];
+            },
+            set(obj, prop, val) {
+                obj[prop] = val;
+                if (handlers.has(obj) && handlers.get(obj).has(prop)) {
+                    for (let handler of handlers.get(obj).get(prop)) {
+                        handler();
+                    }
+                }
+            },
+        });
+        reactivities.set(object, proxy);
+        reactivities.set(proxy, proxy);
+        return proxy;
+    }
+
+    let effect = (handler) => {
+        usedReactivities = [];
+        handler();
+        for (let usedReactivity of usedReactivities) {
+            let [obj, prop] = usedReactivity;
+            if (!handlers.has(obj)) {
+                handlers.set(obj, new Map());
+            }
+            if (!handlers.get(obj).has(prop)) {
+                handlers.get(obj).set(prop, new Set());
+            }
+            handlers.get(obj).get(prop).add(handler);
+        }
+    };
+    let rgbColor = {
+        r: 0,
+        g: 0,
+        b: 0
+    }
+    let proxy = reactive(rgbColor);
+    effect(() => {
+        console.log('repeat');
+        document.getElementById('r').value = proxy.r;
+        document.getElementById('g').value = proxy.g;
+        document.getElementById('b').value = proxy.b;
+        document.getElementById('palette').style.backgroundColor = `rgb(${proxy.r},${proxy.g},${proxy.b})`
+    })
+    document.getElementById('r').addEventListener('change', (e) => {
+        proxy.r = e.target.value
+    })
+    document.getElementById('g').addEventListener('change', (e) => {
+        proxy.g = e.target.value
+    })
+    document.getElementById('b').addEventListener('change', (e) => {
+        proxy.b = e.target.value
+    })
+</script>
+
+
+</html>
