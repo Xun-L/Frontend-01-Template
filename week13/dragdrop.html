@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拖拽 demo</title>
+</head>
+
+<body>
+    <div id="container">
+        文字 文字 文字 文字 文字 文字 文字 文字
+        文字 文字 文字 文字 文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字 文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+        文字 文字 文字 文字
+    </div>
+
+    <div id="dragable" style="width: 100px;height: 100px;background-color: pink;display: inline-block;"></div>
+</body>
+<script>
+    let dragable = document.getElementById('dragable')
+    let baseX = dragable.getBoundingClientRect().left,
+        baseY = dragable.getBoundingClientRect().top;
+    let _time = null
+    dragable.addEventListener('mousedown', (event) => {
+        let startX = event.clientX,
+            startY = event.clientY;
+        let move = (event) => {
+            let range = nearestRange(event.clientX, event.clientY);
+            //console.log(range)
+            if (new Date() - _time > 10 || !_time) {
+                range.insertNode(dragable);
+                _time = new Date()
+            }
+
+
+            //  dragable.style.transform = `translate(${event.clientX-startX}px,${event.clientY-startY}px)`
+        }
+        let up = (event) => {
+            // dragable.style.position = 'absolute';
+            // dragable.style.transform = `translate(0,0)`
+            // dragable.style.left = (baseX + event.clientX - startX) + 'px';
+            // dragable.style.top = (baseY + event.clientY - startY) + 'px'
+            document.removeEventListener('mousemove', move);
+            document.removeEventListener('mouseup', up);
+            // baseX = dragable.getBoundingClientRect().left;
+            // baseY = dragable.getBoundingClientRect().top;
+        }
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', up);
+    })
+
+    let ranges = [];
+    let container = document.getElementById('container');
+    for (let i = 0; i < container.childNodes[0].textContent.length; i++) {
+        let range = document.createRange()
+        range.setStart(container.childNodes[0], i)
+        range.setEnd(container.childNodes[0], i)
+        ranges.push(range)
+    }
+
+    function nearestRange(x0, y0) {
+        let nearest = null;
+        let distance = Infinity;
+        for (let range of ranges) {
+            let rect = range.getBoundingClientRect()
+            if (!rect) {
+                continue;
+            }
+            let {
+                x,
+                y
+            } = rect;
+            let d = (x - x0) ** 2 + (y - y0) ** 2;
+            if (d < distance) {
+                nearest = range;
+                distance = d
+            }
+        }
+        return nearest
+    }
+
+    document.addEventListener('selectstart', e => e.preventDefault())
+</script>
+
+</html>
