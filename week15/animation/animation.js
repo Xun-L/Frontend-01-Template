@@ -30,7 +30,6 @@ export class Timeline {
         animation.isFinished = true;
       }
       let val = animation.valueFromProgression(percent);
-
       object[property] = template(val);
     }
     if (animations.length) {
@@ -43,6 +42,8 @@ export class Timeline {
     }
     this.state = 'pause';
     this.pauseTime = Date.now();
+    console.log('pause');
+    console.log(this.requestId)
     if (this.requestId !== null) {
       cancelAnimationFrame(this.requestId);
     }
@@ -67,8 +68,9 @@ export class Timeline {
   }
   restart() {
     if (this.state === 'playing') {
-      this.pause();
+     // this.pause();
     }
+    this.state = 'playing';
     this.startTime = Date.now();
     this.animations = this.animations.map((n) => {
       n.isFinished = false;
@@ -92,7 +94,6 @@ export class Animation {
   constructor(
     object,
     property,
-
     start,
     end,
     duration,
