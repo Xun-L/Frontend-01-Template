@@ -1,17 +1,16 @@
 export class Timeline {
   constructor() {
-    this.animations = [];
+    this.animations = new Set();
+    this.finishedAnimations = new Set();
+    this.addTimes = new Map();
     this.requestId = null;
     this.state = 'inited';
   }
   tick() {
-    let t = Date.now() - this.startTime;
-    let animations = this.animations.filter((n) => !n.isFinished);
-    for (let animation of animations) {
-      if (t < animation.delay) {
-        continue;
-      }
-
+    let t = Date.now() - this.startTime
+    console.log(this.animations);
+    //  let animations = this.animations.filter((n) => !n.isFinished);
+    for (let animation of this.animations) {
       let {
         object,
         property,
@@ -23,17 +22,24 @@ export class Timeline {
         delay,
         startTime
       } = animation;
-      let percent = timingFunction((t - delay - startTime) / duration);
+      let addTime = this.addTimes.get(animation);
+      if (t < delay + addTime) {
+        continue;
+      }
+      let percent = timingFunction((t - delay - addTime) / duration);
 
-      if (t > duration + delay + startTime) {
+      if (t > duration + delay + addTime) {
         percent = 1;
-        animation.isFinished = true;
+        this.animations.delete(animation);
+        this.finishedAnimations.add(animation);
       }
       let val = animation.valueFromProgression(percent);
       object[property] = template(val);
     }
-    if (animations.length) {
+    if (this.animations.size) {
       this.requestId = requestAnimationFrame(() => this.tick());
+    } else {
+      this.requestId = null;
     }
   }
   pause() {
@@ -42,10 +48,9 @@ export class Timeline {
     }
     this.state = 'pause';
     this.pauseTime = Date.now();
-    console.log('pause');
-    console.log(this.requestId)
     if (this.requestId !== null) {
       cancelAnimationFrame(this.requestId);
+      this.requestId = null;
     }
   }
   resume() {
@@ -66,26 +71,48 @@ export class Timeline {
     this.startTime = Date.now();
     this.tick();
   }
+
+  reset() {
+    if (this.state === 'playing') {
+      this.pause();
+    }
+    this.animations = new Set();
+    this.finishedAnimations = new Set();
+    this.addTimes = new Map();
+    this.requestId = null;
+    this.startTime = Date.now();
+    this.pauseTime = null;
+    this.state = 'init';
+  }
   restart() {
     if (this.state === 'playing') {
-     // this.pause();
+      this.pause();
     }
+    for (let animation of this.finishedAnimations) {
+      this.animations.add(animation);
+    }
+    this.finishedAnimations = new Set();
+    this.requestId = null;
     this.state = 'playing';
     this.startTime = Date.now();
-    this.animations = this.animations.map((n) => {
-      n.isFinished = false;
-      return n;
-    });
+    this.pauseTime = null;
     this.tick();
   }
-  add(animation, startTime) {
-    this.animations.push(animation);
-    animation.isFinished = false;
+  add(animation, addTime) {
+    this.animations.add(animation);
+    if(this.state==='playing'&&this.requestId===null){
+      this.tick()
+    }
     if (this.state === 'playing') {
-      animation.startTime =
-        startTime !== undefined ? startTime : Date.now() - this.startTime;
+      this.addTimes.set(
+        animation,
+        addTime !== undefined ? addTime : Date.now() - this.startTime
+      );
     } else {
-      animation.startTime = startTime !== undefined ? startTime : 0;
+      this.addTimes.set(
+        animation,
+        addTime !== undefined ? addTime : 0
+      );
     }
   }
 }

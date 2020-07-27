@@ -26,10 +26,9 @@ class Carousel {
       let nextPos = (pos + 1) % this.data.length;
       let current = children[pos];
       let next = children[nextPos];
-      console.log(pos);
       let ease = cubicBezier(0.25, 0.1, 0.25, 1);
       current.style.transition = '';
-      next.style.transition = '';
+      next.style.transition = ''; 
       this.tl.add(
         new Animation(
           next.style,
@@ -55,7 +54,7 @@ class Carousel {
         )
       );
       console.log('start');
-      this.tl.tick();
+     // this.tl.tick();
       // tl.add(
       //   new Animation(
       //     el.style,
@@ -82,7 +81,7 @@ class Carousel {
       // }, 16);
 
       pos = nextPos;
-      //this.loop = setTimeout(nextPic, 3000);
+      this.loop = setTimeout(nextPic, 3000);
     };
     nextPic();
     let ele = root.root;
