@@ -7,8 +7,7 @@ export class Timeline {
     this.state = 'inited';
   }
   tick() {
-    let t = Date.now() - this.startTime
-    console.log(this.animations);
+    let t = Date.now() - this.startTime;
     //  let animations = this.animations.filter((n) => !n.isFinished);
     for (let animation of this.animations) {
       let {
@@ -100,8 +99,8 @@ export class Timeline {
   }
   add(animation, addTime) {
     this.animations.add(animation);
-    if(this.state==='playing'&&this.requestId===null){
-      this.tick()
+    if (this.state === 'playing' && this.requestId === null) {
+      this.tick();
     }
     if (this.state === 'playing') {
       this.addTimes.set(
@@ -109,10 +108,7 @@ export class Timeline {
         addTime !== undefined ? addTime : Date.now() - this.startTime
       );
     } else {
-      this.addTimes.set(
-        animation,
-        addTime !== undefined ? addTime : 0
-      );
+      this.addTimes.set(animation, addTime !== undefined ? addTime : 0);
     }
   }
 }

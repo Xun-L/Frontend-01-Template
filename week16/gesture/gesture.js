@@ -49,6 +49,14 @@ export function enableGesture(element) {
     context.isPan = false;
     context.isPress = false;
     context.moves = [];
+    let e = new CustomEvent('start');
+    e = Object.assign(e, {
+      startX: context.startX,
+      startY: context.startY,
+      clientX: point.clientX,
+      clientY: point.clientY
+    });
+    element.dispatchEvent(e);
     context.timeoutHandler = setTimeout(() => {
       let e = new CustomEvent('press');
       e = Object.assign(e, {
@@ -143,6 +151,15 @@ export function enableGesture(element) {
       });
       element.dispatchEvent(e);
     }
+
+    let e = new CustomEvent('end');
+    e = Object.assign(e, {
+      startX: context.startX,
+      startY: context.startY,
+      clientX: point.clientX,
+      clientY: point.clientY
+    });
+    element.dispatchEvent(e);
     clearTimeout(context.timeoutHandler);
   };
 
