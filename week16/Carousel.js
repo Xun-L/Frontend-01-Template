@@ -23,8 +23,6 @@ export class Carousel {
             /^translateX\(([\s\S]+)px\)$/
           )[1] +
           500 * currentPos;
-
-        console.log(offset)
         clearTimeout(this.loopHandler);
       };
 
@@ -35,23 +33,81 @@ export class Carousel {
       let onPan = (event) => {
         let nextPos = (currentPos + 1) % this.data.length;
         let lastPos = (currentPos - 1 + this.data.length) % this.data.length;
-
         let lastElement = children[lastPos];
         let currentElement = children[currentPos];
         let nextElement = children[nextPos];
-        console.log('pan');
-
         let currentFrom = -500 * currentPos + offset;
         let lastFrom = -500 - 500 * lastPos + offset;
         let nextFrom = 500 - 500 * nextPos + offset;
 
         let dx = event.clientX - event.startX;
-        console.log(dx);
-        console.log(offset);
+
         currentElement.style.transform = `translateX(${currentFrom + dx}px)`;
         lastElement.style.transform = `translateX(${lastFrom + dx}px)`;
         nextElement.style.transform = `translateX(${nextFrom + dx}px)`;
-        console.log(currentElement.style.transform);
+      };
+      let onPanEnd = (event) => {
+        let dx = event.clientX - event.startX;
+        let direction = 0;
+        if (dx > 250) {
+          direction = 1;
+        }
+        if (dx < -250) {
+          direction = -1;
+        }
+        let ease = cubicBezier(0.25, 0.1, 0.25, 1);
+        let nextPos = (currentPos + 1) % this.data.length;
+        let lastPos = (currentPos - 1 + this.data.length) % this.data.length;
+        let lastElementStyle = children[lastPos].style;
+        let currentElementStyle = children[currentPos].style;
+        let nextElementStyle = children[nextPos].style;
+        let currentFrom = -500 * currentPos + offset + dx;
+        let lastFrom = -500 - 500 * lastPos + offset + dx;
+        let nextFrom = 500 - 500 * nextPos + offset + dx;
+        this.tl.reset();
+        this.tl.start();
+        this.tl.add(
+          new Animation(
+            currentElementStyle,
+            'transform',
+            currentFrom,
+            direction * 500 - 500 * pos,
+            250,
+            0,
+            ease,
+            (v) => `translateX(${v}px)`
+          )
+        );
+        this.tl.add(
+          new Animation(
+            nextElementStyle,
+            'transform',
+            nextFrom,
+            direction * 500 + 500 - 500 * nextPos,
+            250,
+            0,
+            ease,
+            (v) => `translateX(${v}px)`
+          )
+        );
+
+        this.tl.add(
+          new Animation(
+            lastElementStyle,
+            'transform',
+            lastFrom,
+            direction * 500 - 500 - 500 * lastPos,
+            250,
+            0,
+            ease,
+            (v) => `translateX(${v}px)`
+          )
+        );
+        console.log('---------------------');
+        console.log(lastFrom);
+        console.log(direction * 500 - 500 - 500 * lastPos);
+        console.log('---------------------');
+        pos = (pos - direction + this.data.length) % this.data.length;
       };
 
       let element = (
@@ -60,6 +116,7 @@ export class Carousel {
           onStart={onStart}
           onPan={onPan}
           onEnd={onEnd}
+          onPanEnd={onPanEnd}
           enableGesture={true}
         />
       );

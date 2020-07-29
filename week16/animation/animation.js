@@ -9,6 +9,7 @@ export class Timeline {
   tick() {
     let t = Date.now() - this.startTime;
     //  let animations = this.animations.filter((n) => !n.isFinished);
+
     for (let animation of this.animations) {
       let {
         object,
@@ -35,6 +36,7 @@ export class Timeline {
       let val = animation.valueFromProgression(percent);
       object[property] = template(val);
     }
+
     if (this.animations.size) {
       this.requestId = requestAnimationFrame(() => this.tick());
     } else {
@@ -81,7 +83,7 @@ export class Timeline {
     this.requestId = null;
     this.startTime = Date.now();
     this.pauseTime = null;
-    this.state = 'init';
+    this.state = 'inited';
   }
   restart() {
     if (this.state === 'playing') {
@@ -102,6 +104,11 @@ export class Timeline {
     if (this.state === 'playing' && this.requestId === null) {
       this.tick();
     }
+    
+    if (this.state === 'playing' && this.animations.size === 0) {
+      this.tick();
+    }
+
     if (this.state === 'playing') {
       this.addTimes.set(
         animation,
