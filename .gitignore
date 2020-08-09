@@ -5,4 +5,8 @@ week06/node_modules
 
 */node_modules
 */*/node_modules
+*/*/*/node_modules
+*/*/*/*/node_modules
 week17/components/node_modules/.bin/miller-rabin.cmd
+week17/toolChain/generator/node_modules/.staging/ajv-71d4efc7/lib/ajv.js
+week17/toolChain/generator/node_modules/.bin/which
