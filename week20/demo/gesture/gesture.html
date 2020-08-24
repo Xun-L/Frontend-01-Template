@@ -1,0 +1,33 @@
+<body>
+    <div id="drag" style="width: 50px;height: 50px;background-color: rosybrown;">
+    </div>
+</body>
+<script src="./gesture.js"></script>
+
+<script>
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.addEventListener('selectstart', event => event.preventDefault());
+    document.addEventListener('touchmove', event => event.preventDefault(), {
+        passive: false
+    })
+    let drag = document.getElementById('drag')
+    enableGesture(drag);
+    let x = 0,
+        y = 0;
+    drag.addEventListener('tap', e => {
+        console.log('tap')
+        console.log(e)
+    })
+
+    drag.addEventListener('pan', e => {
+        drag.style.transform = `translate(${x+e.clientX-e.startX}px,${y+e.clientY-e.startY}px)`
+
+        console.log(e)
+    })
+    drag.addEventListener('panend', e => {
+
+        drag.style.transform = `translate(${x+e.clientX-e.startX}px,${y+e.clientY-e.startY}px)`
+        x = x + e.clientX - e.startX;
+        y = y + e.clientY - e.startY;
+    })
+</script>
